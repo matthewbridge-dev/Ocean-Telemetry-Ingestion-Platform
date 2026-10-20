@@ -1,0 +1,29 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+*.egg-info/
+
+# Conda / Virtual Environments
+.conda/
+env/
+venv/
+
+# Large Oceanographic Data Files (NEVER COMMIT BINARY MODEL OUTPUTS)
+data/*
+!data/.gitkeep
+*.nc
+*.nc4
+*.grib2
+*.grb
+*.zarr/
+*.h5
+*.hdf5
+
+# OS / Local IDE Settings
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.env
