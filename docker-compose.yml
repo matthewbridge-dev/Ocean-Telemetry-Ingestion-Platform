@@ -1,0 +1,25 @@
+# Runs the ROS 2 system without VS Code: `docker compose up --build`
+# Uses the same Dockerfile as the dev container, so both environments match.
+# Place this file at the top level of the repo (next to the .devcontainer folder).
+
+services:
+  ros:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    image: team-ros:jazzy
+    volumes:
+      - ./:/ws                # share the repo into the container
+    working_dir: /ws
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+    # Builds the workspace, then starts your launch file.
+    # Set LAUNCH_PKG and LAUNCH_FILE in a .env file next to this one,
+    # or replace the defaults below with your real package and launch file.
+    command: >
+      bash -c "source /opt/ros/jazzy/setup.bash &&
+               colcon build &&
+               source install/setup.bash &&
+               ros2 launch ${LAUNCH_PKG:-my_package} ${LAUNCH_FILE:-bringup.launch.py}"
+    tty: true
+    stdin_open: true

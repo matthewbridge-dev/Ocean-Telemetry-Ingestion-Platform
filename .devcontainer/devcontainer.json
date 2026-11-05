@@ -1,0 +1,7 @@
+{
+  "name": "ROS 2 Jazzy",
+  "build": { "dockerfile": "Dockerfile" },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/ws,type=bind",
+  "workspaceFolder": "/ws",
+  "postCreateCommand": "echo 'source /opt/ros/jazzy/setup.bash' >> ~/.bashrc"
+}
