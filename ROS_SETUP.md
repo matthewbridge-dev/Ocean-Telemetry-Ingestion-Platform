@@ -30,7 +30,7 @@ Docker:
 
  How to run test the system? -> Regular terminal, in the repo folder: 'docker compose build' then run 'docker compose run --rm ros bash'
 
-- How to run the whole system? -> Regular terminal, in the repo folder: 'docker compose up --build'
+- How to run the whole system? -> Regular terminal, in the repo folder: docker compose up --build
 
 - How to stop the system? -> Ctrl+C, then docker compose down
 
