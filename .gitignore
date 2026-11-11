@@ -27,3 +27,14 @@ Thumbs.db
 .vscode/
 .idea/
 .env
+
+# ROS 2 & Colcon Build Outputs
+build/
+install/
+log/
+COLCON_IGNORE
+
+# ROS 2 Test & Tracing Artifacts
+.pytest_cache/
+test_results/
+tracing/
