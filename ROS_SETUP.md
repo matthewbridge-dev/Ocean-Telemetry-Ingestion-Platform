@@ -24,6 +24,8 @@ Robto Developer Extensions by Ranch Hand Robotics (recommended for ROS tools)
 
 Docker:
 
+- How to create the container? -> VS COde: Cmd+Shift+P and type "Dev Containers: Open folder in Container..." and create a container in your repo folder
+
 - How to open the project in the container? -> VS Code: Cmd+Shift+P and type "Reopen in Container"
 
 - How to rebuild after the Dockerfile changes? -> VS Code: Cmd+Shift+P and type "Rebuild Container"
