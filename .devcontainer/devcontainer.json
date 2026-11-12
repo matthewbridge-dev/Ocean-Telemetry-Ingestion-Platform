@@ -1,8 +1,8 @@
 {
-  "name": "ROS 2 Jazzy",
+  "name": "Ocean Telemetry Platform",
   "build": { "dockerfile": "Dockerfile" },
-  "workspaceMount": "source=${localWorkspaceFolder},target=/ws,type=bind",
-  "workspaceFolder": "/ws",
-  "remoteUser": "ubuntu",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/ros2_ws,type=bind",
+  "workspaceFolder": "/ros2_ws",
+  "runArgs": ["--network=host", "--ipc=host", "--pid=host"],
   "postCreateCommand": "echo 'source /opt/ros/jazzy/setup.bash' >> ~/.bashrc"
 }
