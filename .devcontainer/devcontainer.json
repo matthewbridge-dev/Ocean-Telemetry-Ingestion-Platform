@@ -3,6 +3,6 @@
   "build": { "dockerfile": "Dockerfile" },
   "workspaceMount": "source=${localWorkspaceFolder},target=/ros2_ws,type=bind",
   "workspaceFolder": "/ros2_ws",
-  "runArgs": ["--network=host", "--ipc=host", "--pid=host"],
+  "runArgs": ["--name=ocean_telemetry_pipeline_container", "--network=host", "--ipc=host", "--pid=host"],
   "postCreateCommand": "echo 'source /opt/ros/jazzy/setup.bash' >> ~/.bashrc"
 }
