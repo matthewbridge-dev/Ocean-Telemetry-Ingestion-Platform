@@ -1,32 +1,19 @@
 <!-- prettier-ignore -->
 classDiagram
-    %% Configuration Struct
-    class SimConfig {
-        <<Struct>>
-        +str mode
-        +str api_url
-        +str cache_filepath
-        +float default_temp_c
-        +float default_salinity_psu
-    }
-
     %% ROS 2 Entry & Exit Boundary
     class OceanTelemetryNode {
-        -Subscription~UuvPoseMsg~ _pose_sub
-        -Publisher~OceanEnvMsg~ _env_pub
-        -SimulationContext _sim_context
+        -Subscription _pose_sub
+        -Publisher _env_pub
+        -OceanDataContext _context
         -MessageSerializer _serializer
-        +on_pose_received(UuvPoseMsg msg)
+        +on_pose_received()
     }
 
-    %% State & Strategy Router
-    class SimulationContext {
-        -SimConfig _config
+    %% Context Controller
+    class OceanDataContext {
         -OceanDataStrategy _active_strategy
-        +__init__(SimConfig config)
-        +get_environment_at(float lat, float lon, float depth) LocalEnvironmentSample
-        -_verify_connection() bool
-        -_fallback_to_cache(str error_msg)
+        +__init__(OceanDataStrategy _intial_strategy)
+        +set_strategy(OceanDataStrategy _new_strategy)
     }
 
     class OceanDataStrategy {
@@ -36,24 +23,29 @@ classDiagram
 
     class LiveGofsStrategy {
         -ChunkManager _chunk_manager
-        +__init__(str api_url)
+        -str _api_endpoint
+        +__init__()
         +get_environment_at(float lat, float lon, float depth) LocalEnvironmentSample
     }
 
     class RepublishStrategy {
-
+        +__init__()
+        +get_environment_at(float lat, float lon, float depth) LocalEnvironmentSample
     }
 
     class CachedStrategy {
         -OceanGridChunk _offline_chunk
-        +__init__(str filepath)
+        -str _file_path
+        +__init__()
         +get_environment_at(float lat, float lon, float depth) LocalEnvironmentSample
+        -get_offline_chunk()
     }
 
     class StaticStrategy {
-        -LocalEnvironmentSample _static_sample
+        -str _file_path
         +__init__(float temp, float salinity)
         +get_environment_at(float lat, float lon, float depth) LocalEnvironmentSample
+        -get_static_data()
     }
 
     class MessageSerializer {
@@ -69,10 +61,9 @@ classDiagram
     }
 
     %% Relationships
-    OceanTelemetryNode *-- SimulationContext : delegates lookup
+    OceanTelemetryNode *-- OceanDataContext : delegates lookup
     OceanTelemetryNode *-- MessageSerializer : formats ROS output
-    SimulationContext *-- SimConfig : configured by
-    SimulationContext o-- OceanDataStrategy : routes active mode
+    OceanDataContext o-- OceanDataStrategy : routes active mode
 
     LiveGofsStrategy ..|> OceanDataStrategy : implements
     RepublishStrategy ..|> OceanDataStrategy : implements
