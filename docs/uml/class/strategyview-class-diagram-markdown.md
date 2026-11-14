@@ -60,10 +60,18 @@ classDiagram
         +float velocity_v_ms
     }
 
+    class LocalEnvironmentSample {
+        <<Struct>>
+        +float water_temp_c
+        +float salinity_psu
+        +float velocity_u_ms
+        +float velocity_v_ms
+    }
+
     %% Relationships
-    OceanTelemetryNode *-- OceanDataContext : delegates lookup
+    OceanTelemetryNode *-- OceanDataContext : delegates data strategy
     OceanTelemetryNode *-- MessageSerializer : formats ROS output
-    OceanDataContext o-- OceanDataStrategy : routes active mode
+    OceanDataContext o-- OceanDataStrategy : controls active strategy
 
     LiveGofsStrategy ..|> OceanDataStrategy : implements
     RepublishStrategy ..|> OceanDataStrategy : implements

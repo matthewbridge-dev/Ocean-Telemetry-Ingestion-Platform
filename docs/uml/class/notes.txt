@@ -1,0 +1,6 @@
+Notes for Class Diagrams
+
+NormalizedChunk
+Unsure of what the grid store should be array, list, etc.
+Update when sure
+
