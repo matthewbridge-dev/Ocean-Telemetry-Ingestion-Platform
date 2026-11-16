@@ -1,1 +1,3 @@
 docker run --rm -it -v $(pwd):/workspaces/uxs_simulator/umass -w /workspaces/uxs_simulator uxs_sim-no-src:v1.3.0.1537
+
+ros2 launch uxs_sim_bringup node_composer.launch.py
