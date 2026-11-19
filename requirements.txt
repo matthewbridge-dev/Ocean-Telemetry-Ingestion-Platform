@@ -3,3 +3,4 @@ xarray
 h5netcdf
 numpy
 pytest
+certifi

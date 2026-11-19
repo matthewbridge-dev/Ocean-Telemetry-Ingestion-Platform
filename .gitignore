@@ -11,6 +11,7 @@ env/
 venv/
 
 # Large Oceanographic Data Files (NEVER COMMIT BINARY MODEL OUTPUTS)
+output/
 data/*
 !data/.gitkeep
 *.nc
@@ -38,3 +39,4 @@ COLCON_IGNORE
 .pytest_cache/
 test_results/
 tracing/
+

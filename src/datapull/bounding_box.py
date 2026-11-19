@@ -25,4 +25,6 @@ class BoundingBox:
                 f"(got {self.min_lat}, {self.max_lat})."
             )
         if self.max_depth_m < 0.0:
-            raise ValueError(f"max_depth_m must be non-negative (got {self.max_depth_m}).")
+            raise ValueError(
+                f"max_depth_m must be non-negative (got {self.max_depth_m})."
+            )
