@@ -1,0 +1,5 @@
+s3fs
+xarray
+h5netcdf
+numpy
+pytest
