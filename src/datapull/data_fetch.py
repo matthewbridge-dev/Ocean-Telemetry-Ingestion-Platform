@@ -1,7 +1,6 @@
 """data_fetch.py
 
-Data Fetch for grabbing global 3D ocean depth telemetry slices from NOAA Global RTOFS
-via NOMADS Direct HTTPS (rtofs_glo_3dz_*_daily_3z[stuv]io.nc).
+Data Fetch for NOAA Global RTOFS via NOMADS HTTPS
 """
 
 from concurrent.futures import ThreadPoolExecutor
@@ -38,7 +37,7 @@ VAR_FILE_MAP: dict[str, tuple[str, str]] = {
 
 
 class DataFetch:
-
+    
     def __init__(self, fallback_days: int = 2):
         """Initializes the HTTPS filesystem client for NOAA NOMADS 3D Global RTOFS."""
         self.fallback_days = fallback_days
