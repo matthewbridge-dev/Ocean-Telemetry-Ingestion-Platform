@@ -40,3 +40,4 @@ COLCON_IGNORE
 test_results/
 tracing/
 
+.venv/
