@@ -1,12 +1,16 @@
-"""bounding_box.py
+"""Bounding box definitions and coordinate validation.
 
-Dataclass for defining and validating spatial bounds for a data fetch.
+Provides a data structure to specify geographic and vertical bounds
+for pulling regional oceanographic telemetry via data slices.
 """
 from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
 class BoundingBox:
+    """Geographic and vertical bounding box for ocean telemetry queries.
+    """
+
     min_lon: float
     min_lat: float
     max_lon: float
@@ -14,6 +18,13 @@ class BoundingBox:
     max_depth_m: float = 100.0
 
     def __post_init__(self) -> None:
+        """Validates bounding box coordinates and depth constraints.
+
+        Raises:
+            ValueError: If longitudes do not satisfy -180 <= min_lon < max_lon <= 180.
+            ValueError: If latitudes do not satisfy -90 <= min_lat < max_lat <= 90.
+            ValueError: If max_depth_m is negative.
+        """
         if not (-180.0 <= self.min_lon < self.max_lon <= 180.0):
             raise ValueError(
                 f"Longitudes must satisfy -180 <= min_lon < max_lon <= 180 "

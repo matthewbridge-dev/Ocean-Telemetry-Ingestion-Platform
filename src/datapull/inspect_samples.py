@@ -1,15 +1,14 @@
-"""inspect_samples.py
+"""Generates and exports sample 3D ocean telemetry slices for reference regions.
 
-Fetches 3D global ocean test regions and saves cropped slices to <repo_root>/output/samples/
-as both CSV (for manual inspection) and NetCDF (for offline CachedStrategy testing).
+Fetches 3D global ocean test regions (Massachusetts, Peru, Britain, South Africa)
+from NOAA NOMADS via DataFetch and saves cropped slices to <repo_root>/output/samples/
+in both native NetCDF format (for offline cached testing) and flattened CSV format
+(for tabular inspection and manual validation).
 """
-
-# Run from Root
-# PYTHONPATH=src python src/datapull/inspect_samples.py
 
 from pathlib import Path
 from datapull.bounding_box import BoundingBox
-from datapull.data_fetch import DataFetch
+from datapull.data_fetcher import DataFetcher
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SAMPLES_DIR = REPO_ROOT / "output" / "samples"
@@ -32,7 +31,13 @@ LOCATIONS: dict[str, BoundingBox] = {
 
 
 def main() -> None:
-    fetcher = DataFetch(fallback_days=2)
+    """Extracts, inspects, and exports sample telemetry slices for global test locations.
+
+    Iterates through predefined geographic test regions, invokes DataFetcher to retrieve
+    3D oceanographic datasets, writes NetCDF files, and generates cleaned CSV summaries
+    with ocean-only points.
+    """
+    fetcher = DataFetcher()
 
     for name, box in LOCATIONS.items():
         ds = fetcher.fetch(box)
