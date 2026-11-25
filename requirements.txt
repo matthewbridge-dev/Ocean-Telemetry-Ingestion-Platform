@@ -6,3 +6,5 @@ aiohttp
 certifi
 pandas
 pytest
+h5py
+netCDF4
