@@ -4,6 +4,8 @@ End-to-end MVP pipeline:
     BoundingBox -> DataFetcher -> ChunkNormalizer -> [MVP Pose Lookup] -> MessageBuilder -> Print
 """
 
+# PYTHONPATH=src python src/mvp_demo.py
+
 import logging
 import math
 import numpy as np
