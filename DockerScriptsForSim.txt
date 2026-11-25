@@ -1,3 +1,74 @@
+# Open the docker and copy code to umass folder
+
 docker run --rm -it -v $(pwd):/workspaces/uxs_simulator/umass -w /workspaces/uxs_simulator uxs_sim-no-src:v1.3.0.1537
 
 ros2 launch uxs_sim_bringup node_composer.launch.py
+
+# MVP Test
+# Opem the docker image and copy code to umass folder
+docker run --rm -it -v $(pwd):/workspaces/uxs_simulator/umass -w /workspaces/uxs_simulator uxs_sim-no-src:v1.3.0.1537
+
+# Enter Umass directory
+cd /workspaces/uxs_simulator/umass
+
+# Install requirements
+pip3 install -r requirements.txt
+
+# Create the ROS environment and messages
+mkdir -p ~/ocean_ws/src/ocean_interfaces/msg
+
+cat << 'EOF' > ~/ocean_ws/src/ocean_interfaces/msg/Environment.msg
+float32 xdot_ms
+float32 ydot_ms
+float32 salinity_ppt
+float32 temperature_c
+EOF
+
+cat << 'EOF' > ~/ocean_ws/src/ocean_interfaces/package.xml
+<?xml version="1.0"?>
+<package format="3">
+  <name>ocean_interfaces</name>
+  <version>0.0.1</version>
+  <description>Ocean environment telemetry message</description>
+  <maintainer email="team@example.com">team</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
+EOF
+
+cat << 'EOF' > ~/ocean_ws/src/ocean_interfaces/CMakeLists.txt
+cmake_minimum_required(VERSION 3.8)
+project(ocean_interfaces)
+
+find_package(ament_cmake REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/Environment.msg"
+)
+
+ament_export_dependencies(rosidl_default_runtime)
+ament_package()
+EOF
+
+cd ~/ocean_ws
+colcon build --packages-select ocean_interfaces
+source ~/ocean_ws/install/setup.bash
+
+# Run the MVP Demo
+cd /workspaces/uxs_simulator/umass
+PYTHONPATH="src:$PYTHONPATH" python3 src/mvp_demo.py
+
+# Open docker in another image 
+docker ps
+docker exec -it <CONTAINER_ID> bash
+
+source ~/ocean_ws/install/setup.bash
+ros2 topic echo /environment
+

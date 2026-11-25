@@ -2,7 +2,9 @@
 
 import math
 
-from models import EnvironmentSample, OceanEnvMsg
+from ocean_interfaces.msg import Environment
+
+from models.environment_sample import EnvironmentSample
 
 
 class MessageBuilder:
@@ -24,8 +26,8 @@ class MessageBuilder:
             return self._fallback_value
         return float(value)
 
-    def build(self, sample: EnvironmentSample) -> OceanEnvMsg:
-        """Map a EnvironmentSample into a populated OceanEnvMsg.
+    def build(self, sample: EnvironmentSample) -> Environment:
+        """Map a EnvironmentSample into a populated environment topic push.
 
         Args:
             sample: Telemetry sample.
@@ -33,9 +35,9 @@ class MessageBuilder:
         Returns:
             Populated OceanEnvMsg for the ROS 2 publisher.
         """
-        msg = OceanEnvMsg()
-        msg.water_temp_c = self._sanitize_float(sample.water_temp_c)
-        msg.salinity_psu = self._sanitize_float(sample.salinity_psu)
-        msg.velocity_u_ms = self._sanitize_float(sample.velocity_u_ms)
-        msg.velocity_v_ms = self._sanitize_float(sample.velocity_v_ms)
+        msg = Environment()
+        msg.xdot_ms = self._sanitize_float(sample.velocity_u_ms)
+        msg.ydot_ms = self._sanitize_float(sample.velocity_v_ms)
+        msg.salinity_ppt = self._sanitize_float(sample.salinity_psu)
+        msg.temperature_c = self._sanitize_float(sample.water_temp_c)
         return msg

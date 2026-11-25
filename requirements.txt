@@ -1,6 +1,7 @@
-numpy
+numpy<2
 xarray
 h5netcdf
+h5py
 fsspec
 aiohttp
 certifi
