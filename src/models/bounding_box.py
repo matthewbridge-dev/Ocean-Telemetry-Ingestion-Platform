@@ -1,7 +1,4 @@
 """Bounding box definitions and coordinate validation.
-
-Provides a data structure to specify geographic and vertical bounds
-for pulling regional oceanographic telemetry via data slices.
 """
 from dataclasses import dataclass
 

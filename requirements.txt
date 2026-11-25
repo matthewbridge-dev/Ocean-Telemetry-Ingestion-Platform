@@ -1,6 +1,8 @@
-s3fs
+numpy
 xarray
 h5netcdf
-numpy
-pytest
+fsspec
+aiohttp
 certifi
+pandas
+pytest

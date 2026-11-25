@@ -1,7 +1,4 @@
 """Data Fetcher for NOAA Global RTOFS through NOMADS HTTPS
-
-Using HTTP Byte Range requests to download only requested bounding box.
-Fetches and Merges temperature, salinity, and horizontal water velocity (u/v) files from NOAA's NOMADS HTTPS server.
 """
 
 # Used for UTC date resolution
@@ -21,7 +18,7 @@ import numpy as np
 import xarray as xr
 
 # Bounding Box models
-from datapull.bounding_box import BoundingBox
+from models.bounding_box import BoundingBox
 
 logger = logging.getLogger(__name__)
 
@@ -51,12 +48,6 @@ VAR_FILENAME_SUFFIXES: dict[str, str] = {
 
 class DataFetcher:
     """Data Fetcher for cropped 3D ocean telemetry slices from NOAA Global RTOFS via NOMADS HTTPS server.
-
-
-    CHANGE!!!!!
-    Manages HTTPS configuration, daily cycle resolution (with automatic
-    fallback to the previous UTC day), and one-time caching of the static global
-    grid coordinates to minimize redundant network I/O across repeated queries.
     """
 
     def __init__(self) -> None:
@@ -209,9 +200,6 @@ class DataFetcher:
     ) -> tuple[slice, slice, slice]:
         """Convert geographic bounds into contiguous (Depth, Y, X) index slices.
 
-        Note:
-            Assumes the bounding box does not cross the antimeridian (±180°).
-
         Args:
             bounds: Target spatial and depth boundaries.
             latitudes: 2D array of sanitized grid latitudes.
@@ -294,20 +282,6 @@ class DataFetcher:
                 f"Failed to download {variable_name} from {url}: {exc}"
             ) from exc
 
-    def _merge_and_sanitize(self, data_arrays: list[xr.DataArray]) -> xr.Dataset:
-        """Merge variable slices into one Dataset and normalize coordinates."""
-        merged = xr.merge(data_arrays, compat="override")
-
-        if "Longitude" in merged.coords or "Longitude" in merged.data_vars:
-            normalized_lons = xr.apply_ufunc(
-                self._normalize_longitudes, merged["Longitude"]
-            )
-            merged = merged.assign_coords(Longitude=normalized_lons)
-
-        # Strip stale NetCDF encoding metadata
-        merged.encoding.pop("unlimited_dims", None)
-        return merged
-
     def fetch(self, bounds: BoundingBox) -> xr.Dataset:
         """Fetch and merge a 3D ocean telemetry volume for the given bounds.
 
@@ -346,8 +320,8 @@ class DataFetcher:
             for var_name in VAR_FILENAME_SUFFIXES
         ]
 
-        # 5. Merge and sanitize final dataset
-        merged_dataset = self._merge_and_sanitize(data_arrays)
+        # 5. Merge the final dataset
+        merged_dataset = xr.merge(data_arrays, compat="override")
 
         logger.info(
             "DataFetcher (3D): Loaded %.2f KB slice (Depth=%d [0..%.1fm], Y=%d, X=%d)",

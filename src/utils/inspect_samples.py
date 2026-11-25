@@ -5,10 +5,11 @@ from NOAA NOMADS via DataFetch and saves cropped slices to <repo_root>/output/sa
 in both native NetCDF format (for offline cached testing) and flattened CSV format
 (for tabular inspection and manual validation).
 """
+# PYTHONPATH=src python3 src/datapull/inspect_samples.py
 
 from pathlib import Path
-from datapull.bounding_box import BoundingBox
-from datapull.data_fetcher import DataFetcher
+from models.bounding_box import BoundingBox
+from ingestion.data_fetcher import DataFetcher
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SAMPLES_DIR = REPO_ROOT / "output" / "samples"

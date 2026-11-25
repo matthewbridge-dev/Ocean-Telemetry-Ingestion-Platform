@@ -14,8 +14,8 @@ to extract single-point scalar environmental factors from the chunk.
 import time
 import numpy as np
 import pytest
-from datapull.bounding_box import BoundingBox
-from datapull.data_fetcher import DataFetcher
+from models.bounding_box import BoundingBox
+from ingestion.data_fetcher import DataFetcher
 
 SLA_SECONDS = 30.0
 REQUIRED_VARS = ("temperature", "salinity", "u", "v")
