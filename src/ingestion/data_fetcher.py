@@ -1,12 +1,16 @@
 """Data Fetcher for NOAA Global RTOFS through NOMADS HTTPS
 """
 
+# Used for concurrent variable file downloads
+from concurrent.futures import ThreadPoolExecutor
 # Used for UTC date resolution
 from datetime import date, datetime, timedelta, timezone
 # Used for runtime logging
 import logging
 # Used to build the SSLContext, required for HTTPS requests
 import ssl
+# Used for high-resolution fetch timing
+import time
 
 # Provides Mozilla's Certificate Authority bundle so HTTPS works reliably across Operating Systems
 import certifi
@@ -116,7 +120,7 @@ class DataFetcher:
         ):
             return self._cached_base_prefix
 
-        # Get the canidate dates (today and yesterday)
+        # Get the candidate dates (today and yesterday)
         candidate_dates = [
             today_date.strftime("%Y%m%d"),
             (today_date - timedelta(days=1)).strftime("%Y%m%d"),
@@ -297,38 +301,52 @@ class DataFetcher:
             ValueError: If ``bounds`` falls outside the ocean grid.
             RuntimeError: If remote file reads or network transfers fail.
         """
+        fetch_start = time.perf_counter()
+
         # 1. Resolve active cycle
         base_prefix = self._get_active_date_prefix()
 
         # 2. Retrieve grid coordinates (cached after first call)
+        coords_start = time.perf_counter()
         latitudes, longitudes, depths = self._get_grid_coordinates(base_prefix)
+        coords_elapsed = time.perf_counter() - coords_start
 
         # 3. Compute index slices for the requested bounding box
         depth_slice, y_slice, x_slice = self._compute_grid_slices(
             bounds, latitudes, longitudes, depths
         )
 
-        # 4. Download each variable slice sequentially
-        data_arrays: list[xr.DataArray] = [
-            self._fetch_variable_slice(
-                self._build_variable_url(base_prefix, var_name),
-                var_name,
-                depth_slice,
-                y_slice,
-                x_slice,
-            )
-            for var_name in VAR_FILENAME_SUFFIXES
-        ]
+        # 4. Download all variable slices concurrently
+        download_start = time.perf_counter()
+        with ThreadPoolExecutor(max_workers=len(VAR_FILENAME_SUFFIXES)) as executor:
+            futures = [
+                executor.submit(
+                    self._fetch_variable_slice,
+                    self._build_variable_url(base_prefix, var_name),
+                    var_name,
+                    depth_slice,
+                    y_slice,
+                    x_slice,
+                )
+                for var_name in VAR_FILENAME_SUFFIXES
+            ]
+            data_arrays: list[xr.DataArray] = [future.result() for future in futures]
+        download_elapsed = time.perf_counter() - download_start
 
         # 5. Merge the final dataset
         merged_dataset = xr.merge(data_arrays, compat="override")
+        total_elapsed = time.perf_counter() - fetch_start
 
         logger.info(
-            "DataFetcher (3D): Loaded %.2f KB slice (Depth=%d [0..%.1fm], Y=%d, X=%d)",
+            "DataFetcher (3D): Loaded %.2f KB slice (Depth=%d [0..%.1fm], Y=%d, X=%d) "
+            "in %.2fs (coords=%.2fs, download=%.2fs)",
             merged_dataset.nbytes / 1024,
             merged_dataset.sizes["Depth"],
             float(merged_dataset["Depth"].max()),
             merged_dataset.sizes["Y"],
             merged_dataset.sizes["X"],
+            total_elapsed,
+            coords_elapsed,
+            download_elapsed,
         )
         return merged_dataset
